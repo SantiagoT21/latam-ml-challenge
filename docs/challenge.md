@@ -166,3 +166,15 @@ Although both balanced models perform similarly in terms of F1 for the delayed c
 ## 5. Conclusion
 
 By focusing on **F1-score** for the delayed class, I identified that **Logistic Regression with class balancing** (and feature selection) performs as well as XGBoost in identifying delayed flights, while offering clearer interpretability and lower computational costs. Consequently, I chose Logistic Regression for its balance of performance, speed, and simplicity—key advantages in a real-world production environment dealing with flight operations.
+
+
+# Bug Fixes in `test_model.py`
+
+Previously, our test file `test_model.py` attempted to load the CSV file using the path `"../data/data.csv"`. However, when running tests from the repository's root directory, the relative path did not match the actual location of the data file. 
+
+To resolve this, we changed the path to `"./data/data.csv"`. This way, the file is correctly recognized regardless of the current working directory (assuming we run tests from the root). 
+
+Now, we can successfully execute the tests with:
+```bash
+python -m unittest .\tests\model\test_model.py
+```
