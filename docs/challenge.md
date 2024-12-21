@@ -178,3 +178,24 @@ Now, we can successfully execute the tests with:
 ```bash
 python -m unittest .\tests\model\test_model.py
 ```
+
+# Updates to requirements.txt
+While running the API tests, the following error was encountered:
+```bash
+AttributeError: module 'anyio' has no attribute 'start_blocking_portal'
+```
+To address this, we updated the dependencies in requirements.txt to the following versions:
+
+- `fastapi~=0.111.0`
+- `pydantic~=1.10.17`
+- `uvicorn~=0.30.1`
+
+These updates ensure compatibility with the testing framework and resolve the above error.
+
+Now, we can successfully execute the tests with:
+```bash
+python -m unittest .\tests\api\test_api.py
+```
+
+
+
