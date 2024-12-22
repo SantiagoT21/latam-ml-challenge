@@ -1,4 +1,4 @@
-# Bugs fixed on DS jupyter notebook `exploration.ipynb`
+# PART 1: Bugs fixed on DS jupyter notebook `exploration.ipynb`
 
 ---
 
@@ -53,7 +53,7 @@ Fix: I applied minor formatting changes for clarity and consistency.
 
 ---
 
-# Model Analysis and Selection
+# PART 1: Model Analysis and Selection
 
 As part of my role as an ML Engineer, I conducted a thorough analysis of several candidate models to predict flight delays (Trained by DS). In this challenge, the primary concern is the minority class—flights that experience **delays**—since the goal is to accurately identify when a flight is likely to be delayed. Below, I detail my approach, the metrics I considered, and the conclusions I reached regarding the best model to move forward with.
 
@@ -168,7 +168,7 @@ Although both balanced models perform similarly in terms of F1 for the delayed c
 By focusing on **F1-score** for the delayed class, I identified that **Logistic Regression with class balancing** (and feature selection) performs as well as XGBoost in identifying delayed flights, while offering clearer interpretability and lower computational costs. Consequently, I chose Logistic Regression for its balance of performance, speed, and simplicity—key advantages in a real-world production environment dealing with flight operations.
 
 
-# Bug Fixes in `test_model.py`
+# PART 2: Bug Fixes in `test_model.py`
 
 Previously, our test file `test_model.py` attempted to load the CSV file using the path `"../data/data.csv"`. However, when running tests from the repository's root directory, the relative path did not match the actual location of the data file. 
 
@@ -181,7 +181,7 @@ python -m unittest .\tests\model\test_model.py
 make model-test
 ```
 
-# Updates to requirements.txt
+# PART 2: Updates to requirements.txt
 While running the API tests, the following error was encountered:
 ```bash
 AttributeError: module 'anyio' has no attribute 'start_blocking_portal'
@@ -201,7 +201,7 @@ python -m unittest .\tests\api\test_api.py
 make api-test
 ```
 
-# How to Deploy a Docker Container to Cloud Run
+# PART 3: How to Deploy a Docker Container to Cloud Run
 
 ## 1. Build the Docker image
 ```bash
@@ -232,3 +232,97 @@ gcloud run deploy [SERVICE-NAME] \
     --platform managed \
     --allow-unauthenticated
 ```
+
+# PART 4: Setting Up Secrets for Continuous Delivery Workflow in Google Cloud
+
+---
+
+## Prerequisites
+
+Before starting, ensure you have the following:
+
+- Access to a Google Cloud account.
+- Administrative permissions to create a service account in GCP.
+- A GitHub repository where the workflow will be implemented.
+
+---
+
+## Step 1: Create a Service Account
+
+1. **Access the GCP Console**:
+   - Open the [Google Cloud Console](https://console.cloud.google.com).
+
+2. **Navigate to IAM & Admin > Service Accounts**:
+   - In the left-hand menu, go to **IAM & Admin** and select **Service Accounts**.
+
+3. **Create a New Service Account**:
+   - Click on **Create Service Account**.
+   - Provide a descriptive name, e.g., `github-actions-service-account`.
+
+4. **Assign Permissions**:
+   - Grant the following roles to the service account:
+     - **Storage Object Viewer**: To download files from Google Cloud Storage.
+     - **Cloud Build Editor**: To build Docker images.
+     - **Cloud Run Admin**: To deploy services to Cloud Run.
+     - **Artifact Registry Reader**: To access Docker images stored in Artifact Registry.
+
+5. **Finalize and Save**:
+   - Complete the process and create the service account.
+
+---
+
+## Step 2: Generate Service Account Credentials
+
+1. **Go to Service Account Management**:
+   - Navigate to the created service account (`github-actions-service-account`).
+
+2. **Generate a Key**:
+   - Click on the three dots next to the service account and select **Manage Keys**.
+   - Click on **Add Key > Create New Key**.
+   - Select the **JSON** format and download the key file.
+
+3. **Store the JSON Securely**:
+   - Save this file as it contains the credentials required for GitHub Actions.
+
+---
+
+## Step 3: Add Secrets to GitHub Repository
+
+1. **Access GitHub Repository Settings**:
+   - Go to your repository in GitHub.
+   - Navigate to **Settings > Secrets and variables > Actions**.
+
+2. **Add Secrets**:
+   - Click on **New repository secret** for each secret required by the workflow.
+
+3. **Secrets to Add**:
+   - **`GCP_CREDENTIALS`**: Paste the contents of the JSON key file downloaded earlier.
+   - **`MODEL_VERSION`**: Specify the version of the model to download (e.g., `v1.0.0`).
+   - **`GCP_REGION`**: Specify the region for GCP services (e.g., `us-central1`).
+   - **`GCP_PROJECT_ID`**: Provide the Project ID of your GCP project.
+   - **`GCP_IMAGE_NAME`**: Specify the Docker image name (e.g., `delay-service`).
+
+---
+
+## Step 4: Validate the Workflow
+
+1. **Verify Secrets in GitHub**:
+   - Ensure all secrets are correctly added to your GitHub repository.
+
+2. **Run the Workflow**:
+   - Trigger the workflow by pushing changes to the specified branches (`main` or `release/*`).
+
+3. **Check Logs**:
+   - Monitor the workflow logs in GitHub Actions to ensure the deployment is successful.
+
+---
+
+## Example of Secrets Configuration
+
+| Secret Name         | Description                            | Example Value            |
+|---------------------|----------------------------------------|--------------------------|
+| `GCP_CREDENTIALS`   | JSON credentials for service account   | JSON file contents       |
+| `MODEL_VERSION`     | Version of the model to deploy         | `v1.0.0`                |
+| `GCP_REGION`        | GCP region for deployment              | `us-central1`           |
+| `GCP_PROJECT_ID`    | ID of the GCP project                 | `my-gcp-project-id`     |
+| `GCP_IMAGE_NAME`    | Name of the Docker image              | `delay-service`         |

@@ -1,7 +1,0 @@
-name: 'Continuous Delivery'
-
-on:
-  ...
-
-jobs:
-  ...

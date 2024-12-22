@@ -1,0 +1,65 @@
+name: 'Continuous Delivery'
+
+on:
+  push:
+    branches:
+      - main
+      - release/*
+  pull_request:
+    branches:
+      - main
+      - release/*
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.9'
+
+    - name: Cache dependencies
+      uses: actions/cache@v2
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements*.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install -r requirements-dev.txt
+        pip install -r requirements-test.txt
+
+    - name: Set up Google Cloud SDK
+      uses: google-github-actions/auth@v1
+      with:
+        credentials_json: ${{ secrets.GCP_CREDENTIALS }}
+
+    - name: Configure Docker
+      run: gcloud auth configure-docker
+
+    - name: Setup gcloud CLI
+      uses: google-github-actions/setup-gcloud@v1
+      with:
+        version: '390.0.0'
+        service_account_key: ${{ secrets.GCP_CREDENTIALS }}
+
+    - name: Download Model from GCS
+      run: gsutil cp gs://delay-models/source/${{ secrets.MODEL_VERSION }}.pkl delay_model.pkl
+
+    - name: Submit Build
+      run: gcloud builds submit --region ${{ secrets.GCP_REGION }} --tag ${{ secrets.GCP_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/challenge/${{ secrets.GCP_IMAGE_NAME }}:latest
+
+    - name: Deploy to Cloud Run
+      run: gcloud run deploy ${{ secrets.GCP_IMAGE_NAME }} --image ${{ secrets.GCP_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/challenge/${{ secrets.GCP_IMAGE_NAME }}:latest --allow-unauthenticated --region ${{ secrets.GCP_REGION }}
+
+    - name: Run Stress Test
+      run: make stress-test
