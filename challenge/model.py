@@ -8,25 +8,15 @@ from sklearn.linear_model import LogisticRegression
 from datetime import datetime
 from typing import Tuple, Union, List
 
+import json
+from dotenv import load_dotenv
 
-THRESHOLD_IN_MINUTES = 15
-MODEL_DIR = "model"
-MODEL_FILE_NAME = f"{MODEL_DIR}/delay_model.pkl"
-DATA_PATH = "./data/data.csv"
+load_dotenv()
 
-# The 10 features the Data Scientist (DS) decided to keep
-TOP_10_FEATURES = [
-    "OPERA_Latin American Wings",
-    "MES_7",
-    "MES_10",
-    "OPERA_Grupo LATAM",
-    "MES_12",
-    "TIPOVUELO_I",
-    "MES_4",
-    "MES_11",
-    "OPERA_Sky Airline",
-    "OPERA_Copa Air",
-]
+THRESHOLD_IN_MINUTES = int(os.getenv("THRESHOLD_IN_MINUTES"))
+MODEL_FILE_NAME = os.getenv("MODEL_FILE_NAME")
+DATA_PATH = os.getenv("DATA_PATH")
+TOP_10_FEATURES = json.loads(os.getenv("TOP_10_FEATURES"))
 
 class ModelPersistence:
     """

@@ -1,4 +1,4 @@
-name: 'Continuous Delivery'
+name: "Continuous Delivery"
 
 on:
   push:
@@ -15,60 +15,65 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v2
+      - name: Checkout repository
+        uses: actions/checkout@v2
 
-    - name: Set up Python
-      uses: actions/setup-python@v2
-      with:
-        python-version: '3.9'
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: "3.9"
 
-    - name: Cache dependencies
-      uses: actions/cache@v3
-      with:
-        path: ~/.cache/pip
-        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements*.txt') }}
-        restore-keys: |
-          ${{ runner.os }}-pip-
+      - name: Cache dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements*.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
 
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt
-        pip install -r requirements-dev.txt
-        pip install -r requirements-test.txt
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install -r requirements-dev.txt
+          pip install -r requirements-test.txt
 
-    - name: Set up Google Cloud SDK
-      uses: google-github-actions/auth@v1
-      with:
-        credentials_json: ${{ secrets.GCP_CREDENTIALS }}
+      - name: Set up Google Cloud SDK
+        uses: google-github-actions/auth@v1
+        with:
+          credentials_json: ${{ secrets.GCP_CREDENTIALS }}
 
-    - name: Configure Docker
-      run: gcloud auth configure-docker
+      - name: Configure Docker
+        run: gcloud auth configure-docker
 
-    - name: Setup gcloud CLI
-      uses: google-github-actions/setup-gcloud@v1
-      with:
-        version: '390.0.0'
-        service_account_key: ${{ secrets.GCP_CREDENTIALS }}
+      - name: Setup gcloud CLI
+        uses: google-github-actions/setup-gcloud@v1
+        with:
+          version: "390.0.0"
+          service_account_key: ${{ secrets.GCP_CREDENTIALS }}
 
-    - name: Download Model from GCS
-      run: gsutil cp gs://delay-models/source/${{ secrets.MODEL_VERSION }}.pkl delay_model.pkl
+      - name: Download Model from GCS
+        run: gsutil cp gs://delay-models/source/${{ secrets.MODEL_VERSION }}.pkl delay_model.pkl
 
-    - name: Enable Cloud Build
-      run: gcloud services enable cloudbuild.googleapis.com
-    
-    - name: Enable Cloud Run
-      run: gcloud services enable run.googleapis.com
+      - name: Enable Cloud Build
+        run: gcloud services enable cloudbuild.googleapis.com
 
-    - name: Submit Build
-      run: gcloud builds submit --region ${{ secrets.GCP_REGION }} --tag gcr.io/${{ secrets.GCP_PROJECT_ID }}/${{ secrets.GCP_IMAGE_NAME }}:latest
+      - name: Enable Cloud Run
+        run: gcloud services enable run.googleapis.com
 
-    - name: Deploy to Cloud Run
-      run: gcloud run deploy ${{ secrets.GCP_IMAGE_NAME }} --image gcr.io/${{ secrets.GCP_PROJECT_ID }}/${{ secrets.GCP_IMAGE_NAME }}:latest --region ${{ secrets.GCP_REGION }} --platform managed  --allow-unauthenticated
+      - name: Submit Build
+        run: gcloud builds submit --region ${{ secrets.GCP_REGION }} --tag gcr.io/${{ secrets.GCP_PROJECT_ID }}/${{ secrets.GCP_IMAGE_NAME }}:latest
 
-    - name: Create Reports Directory
-      run: mkdir -p reports
+      - name: Deploy to Cloud Run
+        run: gcloud run deploy ${{ secrets.GCP_IMAGE_NAME }} \
+          --image gcr.io/${{ secrets.GCP_PROJECT_ID }}/${{ secrets.GCP_IMAGE_NAME }}:latest \
+          --region ${{ secrets.GCP_REGION }} \
+          --platform managed \
+          --allow-unauthenticated \
+          --update-env-vars THRESHOLD_IN_MINUTES=${{ secrets.THRESHOLD_IN_MINUTES }},MODEL_DIR=${{ secrets.MODEL_DIR }},MODEL_FILE_NAME=${{ secrets.MODEL_FILE_NAME }},DATA_PATH=${{ secrets.DATA_PATH }}
 
-    - name: Run Stress Test
-      run: make stress-test
+      - name: Create Reports Directory
+        run: mkdir -p reports
+
+      - name: Run Stress Test
+        run: make stress-test

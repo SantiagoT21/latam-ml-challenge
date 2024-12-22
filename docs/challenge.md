@@ -326,3 +326,47 @@ Before starting, ensure you have the following:
 | `GCP_REGION`        | GCP region for deployment              | `us-central1`           |
 | `GCP_PROJECT_ID`    | ID of the GCP project                 | `my-gcp-project-id`     |
 | `GCP_IMAGE_NAME`    | Name of the Docker image              | `delay-service`         |
+
+
+
+
+# PART 5: Adding Environment Variables to Cloud Run Deployment
+
+## Overview
+
+In this section, we will update the GitHub Actions workflow to include environment variables during the deployment of a service to **Cloud Run**. This ensures that critical configuration values (like thresholds or file paths) are passed to the application securely and effectively.
+
+---
+
+## Step 1: Define Environment Variables in GitHub Secrets
+
+To pass environment variables during the deployment, you can store their values securely in GitHub Secrets.
+
+### Required Secrets:
+- **`THRESHOLD_IN_MINUTES`**: The delay threshold in minutes (e.g., `1`).
+- **`MODEL_FILE_NAME`**: Model file path (e.g., `model_path_.pkl`).
+- **`DATA_PATH`**: Path to the data file (e.g., `data_path.csv`).
+- **`TOP_10_FEATURES`**: A JSON array of the top 10 features (e.g., `["feature1", "feature2", "feature3", ...]`).
+
+#### Add Secrets:
+1. Go to **Settings > Secrets and variables > Actions** in your GitHub repository.
+2. Add a new secret for each variable:
+   - **Key**: `THRESHOLD_IN_MINUTES`
+     - **Value**: `1`
+   - Repeat this process for the other variables (`DATA_PATH`, `MODEL_FILE_NAME`, etc.).
+
+---
+
+## Step 2: Update the GitHub Actions Workflow
+
+Modify the GitHub Actions workflow to include the environment variables during deployment.
+
+### Example Workflow Update:
+```yaml
+- name: Deploy to Cloud Run
+  run: gcloud run deploy ${{ secrets.GCP_IMAGE_NAME }} \
+        --image gcr.io/${{ secrets.GCP_PROJECT_ID }}/${{ secrets.GCP_IMAGE_NAME }}:latest \
+        --region ${{ secrets.GCP_REGION }} \
+        --platform managed \
+        --allow-unauthenticated \
+        --update-env-vars THRESHOLD_IN_MINUTES=${{ secrets.THRESHOLD_IN_MINUTES }},MODEL_DIR=${{ secrets.MODEL_DIR }},MODEL_FILE_NAME=${{ secrets.MODEL_FILE_NAME }},DATA_PATH=${{ secrets.DATA_PATH }},TOP_10_FEATURES=${{ secrets.TOP_10_FEATURES }}
