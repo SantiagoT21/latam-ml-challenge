@@ -18,7 +18,6 @@ jobs:
       THRESHOLD_IN_MINUTES: ${{ secrets.THRESHOLD_IN_MINUTES }}
       MODEL_FILE_NAME: ${{ secrets.MODEL_FILE_NAME }}
       DATA_PATH: ${{ secrets.DATA_PATH }}
-      TOP_10_FEATURES: ${{ secrets.TOP_10_FEATURES }}
 
     steps:
     - name: Checkout repository
