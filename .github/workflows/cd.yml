@@ -70,7 +70,7 @@ jobs:
           --region ${{ secrets.GCP_REGION }} \
           --platform managed \
           --allow-unauthenticated \
-          --update-env-vars THRESHOLD_IN_MINUTES=${{ secrets.THRESHOLD_IN_MINUTES }},MODEL_DIR=${{ secrets.MODEL_DIR }},MODEL_FILE_NAME=${{ secrets.MODEL_FILE_NAME }},DATA_PATH=${{ secrets.DATA_PATH }}
+          --update-env-vars THRESHOLD_IN_MINUTES=${{ secrets.THRESHOLD_IN_MINUTES }},MODEL_FILE_NAME=${{ secrets.MODEL_FILE_NAME }},DATA_PATH=${{ secrets.DATA_PATH }}
 
       - name: Create Reports Directory
         run: mkdir -p reports
