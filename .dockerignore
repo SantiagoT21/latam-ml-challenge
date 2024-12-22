@@ -1,0 +1,50 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual environments
+venv/
+.venv/
+
+# Environment variables
+.env
+
+# Distribution / packaging
+build/
+dist/
+*.egg-info/
+.eggs/
+*.egg
+
+# Docker specific
+Dockerfile
+docker-compose.yml
+docker-compose.override.yml
+
+# Git
+.git/
+.gitignore
+
+# Python test / coverage
+.coverage
+htmlcov/
+.pytest_cache/
+
+# Jupyter notebooks (si no se necesitan en la imagen)
+*.ipynb
+
+# Model artifacts (Pickle, Joblib, etc.)
+#*.pkl
+*.joblib
+
+# Mac / Windows specific files
+.DS_Store
+Thumbs.db
+
+# commands
+run.txt
+
+# test reports
+reports/
