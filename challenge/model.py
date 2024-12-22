@@ -1,13 +1,18 @@
+import os
 import pickle
+
 import numpy as np
 import pandas as pd
+from sklearn.linear_model import LogisticRegression
 
 from datetime import datetime
 from typing import Tuple, Union, List
-from sklearn.linear_model import LogisticRegression
+
 
 THRESHOLD_IN_MINUTES = 15
-MODEL_FILE_NAME = "delay_model.pkl"
+MODEL_DIR = "model"
+MODEL_FILE_NAME = f"{MODEL_DIR}/delay_model.pkl"
+DATA_PATH = "./data/data.csv"
 
 # The 10 features the Data Scientist (DS) decided to keep
 TOP_10_FEATURES = [
@@ -23,30 +28,51 @@ TOP_10_FEATURES = [
     "OPERA_Copa Air",
 ]
 
+class ModelPersistence:
+    """
+    Maneja la carga y guardado del modelo en disco.
+    Si el archivo no existe, retorna None.
+    """
+    @staticmethod
+    def load_model(filepath: str):
+        try:
+            with open(filepath, "rb") as fp:
+                model = pickle.load(fp)
+            return model
+        except FileNotFoundError:
+            return None
+
+    @staticmethod
+    def save_model(model, filepath: str):
+        with open(filepath, "wb") as fp:
+            pickle.dump(model, fp)
 
 class DelayModel:
 
     def __init__(self):
         self._features = TOP_10_FEATURES
-        self._model = self.__load_model(MODEL_FILE_NAME)
+        self._model = ModelPersistence.load_model(MODEL_FILE_NAME)
+        
+        if self._model is None:
+            self._train_from_scratch(DATA_PATH)
 
-    def __load_model(self, file_name: str):
+    def _train_from_scratch(self, data_path: str) -> None:
         """
-        Load a pre-trained model from disk.
-        If file doesn't exist, return None (meaning we'll train from scratch).
+        Read the CSV from data_path, do preprocessing
+        and train the LogisticRegression model. Then save the model.
         """
-        try:
-            with open(file_name, "rb") as fp:
-                return pickle.load(fp)
-        except FileNotFoundError:
-            return None
+        if not os.path.exists(data_path):
+            return
 
-    def __save_model(self, filename: str):
-        """
-        Save the trained Logistic Regression model to disk.
-        """
-        with open(filename, "wb") as fp:
-            pickle.dump(self._model, fp)
+        data = pd.read_csv(data_path)
+        features, target = self._engineer.preprocess(data, target_column="delay")
+
+        self._model = LogisticRegression(class_weight="balanced", random_state=42)
+        if isinstance(target, pd.DataFrame):
+            target = target.squeeze()
+
+        self._model.fit(features, target)
+        ModelPersistence.save_model(self._model, MODEL_FILE_NAME)
 
     def get_min_diff(self, row: pd.Series) -> float:
         """
@@ -114,10 +140,9 @@ class DelayModel:
             target = target.squeeze()
 
         self._model = LogisticRegression(class_weight="balanced", random_state=42)
-
         self._model.fit(features, target)
 
-        self.__save_model(MODEL_FILE_NAME)
+        ModelPersistence.save_model(self._model, MODEL_FILE_NAME)
 
     def predict(self, features: pd.DataFrame) -> List[int]:
         """
@@ -130,8 +155,9 @@ class DelayModel:
             (List[int]): predicted targets.
         """
         if self._model is None:
-            self._model = self.__load_model(MODEL_FILE_NAME)
+            self._model = ModelPersistence.load_model(MODEL_FILE_NAME)
+            if self._model is None:
+                raise ValueError("Model not found.")
 
         predictions = self._model.predict(features)
-
         return predictions.tolist()
