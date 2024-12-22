@@ -44,6 +44,7 @@ class ModelPersistence:
 
     @staticmethod
     def save_model(model, filepath: str):
+        os.makedirs(os.path.dirname(filepath), exist_ok=True)
         with open(filepath, "wb") as fp:
             pickle.dump(model, fp)
 
@@ -65,7 +66,7 @@ class DelayModel:
             return
 
         data = pd.read_csv(data_path)
-        features, target = self._engineer.preprocess(data, target_column="delay")
+        features, target = self.preprocess(data, target_column="delay")
 
         self._model = LogisticRegression(class_weight="balanced", random_state=42)
         if isinstance(target, pd.DataFrame):
