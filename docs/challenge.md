@@ -235,8 +235,6 @@ gcloud run deploy [SERVICE-NAME] \
 
 # PART 4: Setting Up Secrets for Continuous Delivery Workflow in Google Cloud
 
-This guide explains how to create and configure the necessary secrets for deploying a Continuous Delivery workflow in Google Cloud Platform (GCP) using GitHub Actions.
-
 ---
 
 ## Prerequisites
