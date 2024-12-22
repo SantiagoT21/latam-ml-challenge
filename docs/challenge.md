@@ -201,5 +201,34 @@ python -m unittest .\tests\api\test_api.py
 make api-test
 ```
 
+# How to Deploy a Docker Container to Cloud Run
 
+## 1. Build the Docker image
+```bash
+docker build -t gcr.io/[PROJECT-ID]/[IMAGE-NAME]:[TAG] .
+```
 
+---
+
+## 2. Authenticate Docker with Google Cloud
+```bash
+gcloud auth configure-docker
+```
+
+---
+
+## 3. Push the image to Google Container Registry
+```bash
+docker push gcr.io/[PROJECT-ID]/[IMAGE-NAME]:[TAG]
+```
+
+---
+
+## 4. Deploy to Cloud Run
+```bash
+gcloud run deploy [SERVICE-NAME] \
+    --image gcr.io/[PROJECT-ID]/[IMAGE-NAME]:[TAG] \
+    --region [REGION] \
+    --platform managed \
+    --allow-unauthenticated
+```

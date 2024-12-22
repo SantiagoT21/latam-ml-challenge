@@ -21,7 +21,7 @@ RUN pip3 install --no-cache-dir -r requirements.txt
 ENV LC_ALL=C.UTF-8
 ENV LANG=C.UTF-8
 
-EXPOSE 80
+EXPOSE 8080
 
 # Start the app
-CMD ["gunicorn", "-b", "0.0.0.0:80","challenge.api:app","--workers","1","--timeout","600","-k","uvicorn.workers.UvicornWorker"]
+CMD ["gunicorn", "-b", "0.0.0.0:8080","challenge.api:app","--workers","1","--timeout","600","-k","uvicorn.workers.UvicornWorker"]
