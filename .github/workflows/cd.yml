@@ -69,8 +69,8 @@ jobs:
           --image gcr.io/${{ secrets.GCP_PROJECT_ID }}/${{ secrets.GCP_IMAGE_NAME }}:latest \
           --region ${{ secrets.GCP_REGION }} \
           --platform managed \
-          --allow-unauthenticated \
-          --update-env-vars THRESHOLD_IN_MINUTES=${{ secrets.THRESHOLD_IN_MINUTES }},MODEL_FILE_NAME=${{ secrets.MODEL_FILE_NAME }},DATA_PATH=${{ secrets.DATA_PATH }}
+          --set-env-vars "THRESHOLD_IN_MINUTES=${{ secrets.THRESHOLD_IN_MINUTES }},MODEL_FILE_NAME=${{ secrets.MODEL_FILE_NAME}},DATA_PATH=${{ secrets.DATA_PATH }},TOP_10_FEATURES=${{ secrets.TOP_10_FEATURES }}" \
+          --allow-unauthenticated
 
       - name: Create Reports Directory
         run: mkdir -p reports
