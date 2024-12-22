@@ -56,10 +56,10 @@ jobs:
       run: gsutil cp gs://delay-models/source/${{ secrets.MODEL_VERSION }}.pkl delay_model.pkl
 
     - name: Submit Build
-      run: gcloud builds submit --region ${{ secrets.GCP_REGION }} --tag ${{ secrets.GCP_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/challenge/${{ secrets.GCP_IMAGE_NAME }}:latest
+      run: gcloud builds submit --region ${{ secrets.GCP_REGION }} --tag gcr.io/${{ secrets.GCP_PROJECT_ID }}/${{ secrets.GCP_IMAGE_NAME }}:latest    
 
     - name: Deploy to Cloud Run
-      run: gcloud run deploy ${{ secrets.GCP_IMAGE_NAME }} --image ${{ secrets.GCP_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/challenge/${{ secrets.GCP_IMAGE_NAME }}:latest --allow-unauthenticated --region ${{ secrets.GCP_REGION }}
+      run: gcloud run deploy ${{ secrets.GCP_IMAGE_NAME }} --image gcr.io/${{ secrets.GCP_PROJECT_ID }}/${{ secrets.GCP_IMAGE_NAME }}:latest --region ${{ secrets.GCP_REGION }} --platform managed  --allow-unauthenticated
 
     - name: Run Stress Test
       run: make stress-test
