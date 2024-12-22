@@ -177,6 +177,8 @@ To resolve this, we changed the path to `"./data/data.csv"`. This way, the file 
 Now, we can successfully execute the tests with:
 ```bash
 python -m unittest .\tests\model\test_model.py
+# and
+make model-test
 ```
 
 # Updates to requirements.txt
@@ -195,6 +197,8 @@ These updates ensure compatibility with the testing framework and resolve the ab
 Now, we can successfully execute the tests with:
 ```bash
 python -m unittest .\tests\api\test_api.py
+#and
+make api-test
 ```
 
 

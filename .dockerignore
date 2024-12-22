@@ -45,3 +45,6 @@ Thumbs.db
 
 # commands
 run.txt
+
+# test reports
+reports/
