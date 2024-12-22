@@ -46,3 +46,4 @@ async def post_predict(input_data: PredictionInfo) -> dict:
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"An error occurred while processing the prediction: {str(e)}",
         )
+
