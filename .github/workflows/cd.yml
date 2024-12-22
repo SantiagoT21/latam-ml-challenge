@@ -55,8 +55,14 @@ jobs:
     - name: Download Model from GCS
       run: gsutil cp gs://delay-models/source/${{ secrets.MODEL_VERSION }}.pkl delay_model.pkl
 
+    - name: Enable Cloud Build
+      run: gcloud services enable cloudbuild.googleapis.com
+
     - name: Submit Build
       run: gcloud builds submit --region ${{ secrets.GCP_REGION }} --tag gcr.io/${{ secrets.GCP_PROJECT_ID }}/${{ secrets.GCP_IMAGE_NAME }}:latest    
+
+    - name: Enable Cloud Run
+      run: gcloud services enable run.googleapis.com
 
     - name: Deploy to Cloud Run
       run: gcloud run deploy ${{ secrets.GCP_IMAGE_NAME }} --image gcr.io/${{ secrets.GCP_PROJECT_ID }}/${{ secrets.GCP_IMAGE_NAME }}:latest --region ${{ secrets.GCP_REGION }} --platform managed  --allow-unauthenticated
