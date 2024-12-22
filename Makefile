@@ -23,7 +23,7 @@ install:		## Install dependencies
 	pip install -r requirements-test.txt
 	pip install -r requirements.txt
 
-STRESS_URL = http://127.0.0.1:8000 
+STRESS_URL = https://fastapi-flight-delay-304330506831.us-central1.run.app
 .PHONY: stress-test
 stress-test: ## change stress url to your deployed app. change 'reports || true' to 'if not exist reports mkdir reports' for windows
 	if not exist reports mkdir reports
